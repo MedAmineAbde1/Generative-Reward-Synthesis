@@ -1,0 +1,26 @@
+mohamed_admin@rat-ws202:~/ros2_ws$ gz service -s /gui/move_to --reqtype gz.msgs.StringMsg --reptype gz.msgs.Boolean --timeout 2000 --req 'data: "rosbot"'
+
+mohamed_admin@rat-ws202:~/ros2_ws$ gz service --info --service /marker
+
+mohamed_admin@rat-ws202:~/ros2_ws$ gz msg -i gz.msgs.Marker
+
+
+mohamed_admin@rat-ws202:~/ros2_ws$ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p stamped:=true
+
+mohamed_admin@rat-ws202:~/ros2_ws$ gz model -m rosbot -p
+
+mohamed_admin@rat-ws202:~/ros2_ws$ gz -h
+
+mohamed_admin@rat-ws202:~/ros2_ws$ ros2 launch rosbot_gazebo simulation.yaml robot_model:=rosbot gz_world:=/home/mohamed_admin/ros2_ws/src/husarion_gz_worlds/worlds/sonoma_raceway.sdf z:=1
+
+--activating your virtual environment 
+source venv/bin/activate
+--or:
+cd ~/Desktop/gz_migrator
+python3 -m venv venv
+source venv/bin/activate
+pip install flask lxml
+
+mohamed_admin@rat-ws202:~/ros2_ws$ echo $GZ_SIM_RESOURCE_PATH 
+/home/mohamed_admin/ros2_ws/install/rosbot_description/share:/home/mohamed_admin/ros2_ws/install/husarion_gz_worlds/share/husarion_gz_worlds/models:/opt/ros/jazzy/share:/opt/ros/jazzy/share
+

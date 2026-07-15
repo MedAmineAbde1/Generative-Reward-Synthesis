@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gazebo World Migrator — Classic → Harmonic</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- Monaco Editor CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="18" fill="#FF6B35"/>
+        <path d="M10 18 L18 10 L26 18 L18 26 Z" fill="white" opacity="0.9"/>
+        <circle cx="18" cy="18" r="4" fill="#FF6B35"/>
+      </svg>
+      <span class="logo-text">GZ&nbsp;<span class="logo-accent">Migrator</span></span>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-from">Gazebo Classic 11</span>
+      <span class="badge-arrow">→</span>
+      <span class="badge badge-to">Gazebo Harmonic</span>
+    </div>
+    <div class="header-links">
+      <a href="https://gazebosim.org/docs/latest/gazebo_classic_migration/" target="_blank" class="header-link">Docs</a>
+      <a href="https://github.com/gazebosim" target="_blank" class="header-link">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <h1 class="hero-title">Migrate Your Gazebo World Files</h1>
+  <p class="hero-subtitle">
+    Automatically convert <code>.world</code> / <code>.sdf</code> files from
+    <strong>Gazebo Classic (SDFormat ≤1.7)</strong> to
+    <strong>Gazebo Harmonic (SDFormat 1.11)</strong> — covering plugins,
+    sensors, physics, materials, and structural tags.
+  </p>
+</section>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+
+  <!-- ---- Upload Panel ---- -->
+  <section class="panel upload-panel" id="upload-section">
+    <h2 class="panel-title">
+      <span class="step-badge">1</span> Upload Your World File
+    </h2>
+
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 4L24 32M24 4L16 12M24 4L32 12" stroke="#FF6B35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 36V40C8 42.2 9.8 44 12 44H36C38.2 44 40 42.2 40 40V36" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="drop-text">Drag &amp; drop your <code>.world</code> or <code>.sdf</code> file here</p>
+      <p class="drop-subtext">or</p>
+      <label class="btn btn-primary" for="file-input">Browse File</label>
+      <input type="file" id="file-input" accept=".world,.sdf,.xml" style="display:none" />
+      <p class="drop-hint">Max file size: 10 MB</p>
+    </div>
+
+    <div class="or-divider"><span>OR paste XML directly</span></div>
+
+    <div class="paste-area-wrap">
+      <div id="paste-editor" class="paste-editor"></div>
+      <div class="paste-actions">
+        <button class="btn btn-secondary" id="clear-paste-btn">Clear</button>
+        <button class="btn btn-primary" id="migrate-paste-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 8a6 6 0 1 1 12 0A6 6 0 0 1 2 8zm6-7a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.5 4a.5.5 0 0 0-1 0v3.793L6.354 7.646a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 8.793V5z"/></svg>
+          Migrate Pasted XML
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="loading-wrap" id="loading" style="display:none">
+      <div class="spinner"></div>
+      <p>Migrating…</p>
+    </div>
+
+    <!-- Error display -->
+    <div class="alert alert-error" id="error-box" style="display:none">
+      <strong>Error:</strong> <span id="error-msg"></span>
+    </div>
+  </section>
+
+  <!-- ---- Results Panel ---- -->
+  <section class="panel results-panel" id="results-section" style="display:none">
+    <h2 class="panel-title">
+      <span class="step-badge">2</span> Migration Results
+    </h2>
+
+    <!-- Stats bar -->
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat stat-changes">
+        <span class="stat-num" id="stat-changes">0</span>
+        <span class="stat-label">Changes</span>
+      </div>
+      <div class="stat stat-warnings">
+        <span class="stat-num" id="stat-warnings">0</span>
+        <span class="stat-label">Warnings</span>
+      </div>
+      <div class="stat stat-errors">
+        <span class="stat-num" id="stat-errors">0</span>
+        <span class="stat-label">Errors</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="output">Output SDF</button>
+      <button class="tab" data-tab="report">Migration Report</button>
+      <button class="tab" data-tab="diff">Side-by-Side Diff</button>
+    </div>
+
+    <!-- Output SDF tab -->
+    <div class="tab-content active" id="tab-output">
+      <div class="editor-toolbar">
+        <span class="editor-label">Migrated SDFormat 1.11 file</span>
+        <div class="editor-actions">
+          <button class="btn btn-sm btn-secondary" id="copy-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1H2z"/></svg>
+            Copy
+          </button>
+          <button class="btn btn-sm btn-primary" id="download-btn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+            Download .sdf
+          </button>
+        </div>
+      </div>
+      <div id="output-editor" class="code-editor"></div>
+    </div>
+
+    <!-- Report tab -->
+    <div class="tab-content" id="tab-report">
+      <div class="report-sections">
+        <div class="report-section report-changes" id="report-changes-section">
+          <h3 class="report-section-title">
+            <span class="dot dot-green"></span> Changes Applied
+            <span class="count-badge" id="changes-count">0</span>
+          </h3>
+          <ul class="report-list" id="changes-list"></ul>
+        </div>
+        <div class="report-section report-warnings" id="report-warnings-section">
+          <h3 class="report-section-title">
+            <span class="dot dot-yellow"></span> Warnings — Manual Review Needed
+            <span class="count-badge" id="warnings-count">0</span>
+          </h3>
+          <ul class="report-list" id="warnings-list"></ul>
+        </div>
+        <div class="report-section report-errors" id="report-errors-section" style="display:none">
+          <h3 class="report-section-title">
+            <span class="dot dot-red"></span> Errors
+            <span class="count-badge" id="errors-count">0</span>
+          </h3>
+          <ul class="report-list" id="errors-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diff tab -->
+    <div class="tab-content" id="tab-diff">
+      <div class="diff-header">
+        <div class="diff-label diff-label-left">Original (Gazebo Classic)</div>
+        <div class="diff-label diff-label-right">Migrated (Gazebo Harmonic)</div>
+      </div>
+      <div id="diff-editor" class="diff-editor"></div>
+    </div>
+
+    <!-- Migrate another -->
+    <div class="migrate-another">
+      <button class="btn btn-secondary" id="reset-btn">
+        ↩ Migrate Another File
+      </button>
+    </div>
+  </section>
+
+  <!-- ---- What Gets Migrated ---- -->
+  <section class="panel info-panel">
+    <h2 class="panel-title">What Gets Migrated</h2>
+    <div class="migration-grid">
+      <div class="migration-card">
+        <div class="migration-card-icon">🔧</div>
+        <h3>SDF Version</h3>
+        <p>Updates the <code>&lt;sdf version&gt;</code> header from 1.6/1.7 to <strong>1.11</strong> and wraps bare <code>&lt;world&gt;</code> roots.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">🔌</div>
+        <h3>Plugin Migration</h3>
+        <p>Remaps 40+ classic <code>lib*.so</code> plugins to their <code>gz-sim-*-system</code> equivalents with correct <code>name</code> attributes.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">🌍</div>
+        <h3>World Plugins</h3>
+        <p>Auto-injects required Harmonic world plugins: Physics, UserCommands, SceneBroadcaster, Sensors, IMU, Contact, NavSat.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">📡</div>
+        <h3>Sensor Tags</h3>
+        <p>Converts <code>ray</code> → <code>gpu_lidar</code>, renames <code>&lt;ray&gt;</code> → <code>&lt;lidar&gt;</code>, removes sensor-level plugins, adds <code>&lt;topic&gt;</code> tags.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">⚙️</div>
+        <h3>Physics Engine</h3>
+        <p>Migrates <code>type="ode"</code> → <code>type="dart"</code>, removes ODE-specific solver/constraint tags with warnings.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">🎨</div>
+        <h3>Materials</h3>
+        <p>Converts Ogre <code>&lt;script&gt;</code> materials (Gazebo/Red, Blue, etc.) to <code>&lt;ambient&gt;</code>/<code>&lt;diffuse&gt;</code>/<code>&lt;specular&gt;</code> RGBA tags.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">🔗</div>
+        <h3>URIs &amp; Paths</h3>
+        <p>Warns about <code>model://</code> URIs requiring <code>GZ_SIM_RESOURCE_PATH</code> instead of <code>GAZEBO_MODEL_PATH</code>.</p>
+      </div>
+      <div class="migration-card">
+        <div class="migration-card-icon">🗑️</div>
+        <h3>Deprecated Tags</h3>
+        <p>Removes <code>&lt;sdf_version&gt;</code> in includes, invalid <code>&lt;static&gt;</code> on worlds, <code>&lt;allow_auto_disable&gt;</code>, and <code>&lt;ros&gt;</code> plugin sub-elements.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>
+    GZ Migrator — Open source tool for Gazebo Classic → Gazebo Harmonic migration.
+    Based on the <a href="https://gazebosim.org/docs/latest/gazebo_classic_migration/" target="_blank">official migration guides</a>.
+  </p>
+</footer>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

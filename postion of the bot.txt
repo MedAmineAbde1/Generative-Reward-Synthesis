@@ -1,0 +1,232 @@
+postion of the bot in the map/world sonoma race way allegedly :
+
+output of ~/ros2_ws$ ros2 topic echo /odometry/wheels :
+
+header:
+  stamp:
+    sec: 60
+    nanosec: 765000000
+  frame_id: odom
+child_frame_id: base_link
+pose:
+  pose:
+    position:
+      x: 8.138372481980605e-31
+      y: 1.2508696239228193e-67
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 2.611294347560813e-37
+      w: 1.0
+  covariance:
+  - 0.001
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.001
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.001
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.001
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.001
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.01
+twist:
+  twist:
+    linear:
+      x: -6.904670625538862e-38
+      y: 0.0
+      z: 0.0
+    angular:
+      x: 0.0
+      y: 0.0
+      z: 1.1451471325496913e-43
+  covariance:
+  - 3.3e-05
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 3.3e-05
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0028
+---
+
+output of ~/ros2_ws$ ros2 topic echo /odometry/filtered :
+
+header:
+  stamp:
+    sec: 1048
+    nanosec: 400000000
+  frame_id: odom
+child_frame_id: base_link
+pose:
+  pose:
+    position:
+      x: -1.690735161933998e-35
+      y: 1.0666681994362734e-38
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.001109230536341164
+      w: 0.9999993848036194
+  covariance:
+  - 0.0025591987266934406
+  - 3.426660310986273e-24
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.6901518072858617e-44
+  - -5.31528167050676e-25
+  - 0.0025591987266934406
+  - 0.0
+  - 0.0
+  - 0.0
+  - -1.3099276040582514e-41
+  - 0.0
+  - 0.0
+  - 1.7416162042911242e-08
+  - 2.0134739187235946e-48
+  - 1.903540291984134e-45
+  - 0.0
+  - 0.0
+  - 0.0
+  - 2.0134739187235943e-48
+  - 8.974213226829906e-09
+  - 8.841149459814633e-29
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.9035402919841308e-45
+  - -8.841149459814633e-29
+  - 8.974213226829906e-09
+  - 0.0
+  - 1.6901518072858642e-44
+  - -1.30992760405825e-41
+  - 0.0
+  - 0.0
+  - 0.0
+  - 1.822290748344076e-05
+twist:
+  twist:
+    linear:
+      x: -9.82134565446937e-37
+      y: 0.0
+      z: 0.0
+    angular:
+      x: 0.0
+      y: 0.0
+      z: 0.0016561615295897698
+  covariance:
+  - 0.0001331744485862918
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0001331744485862918
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 4.919333761423044e-07
+  - 4.121768361177718e-57
+  - 3.882124950540684e-54
+  - 0.0
+  - 0.0
+  - 0.0
+  - 4.12176836117772e-57
+  - 4.993765575578765e-07
+  - 1.4189651339829744e-38
+  - 0.0
+  - 0.0
+  - 0.0
+  - 3.8821249505406794e-54
+  - -1.4189651339820264e-38
+  - 4.993765575578765e-07
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0007163334846444298
+---
+
+output of ~/ros2_ws$ gz model -m rosbot -p :
+
+Requesting state for world [sonoma]...
+
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="fl_range"]/gz_frame_id:<data-string>:L122]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="fr_range"]/gz_frame_id:<data-string>:L150]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="rl_range"]/gz_frame_id:<data-string>:L178]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="rr_range"]/gz_frame_id:<data-string>:L206]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="oak_color"]/gz_frame_id:<data-string>:L225]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="oak_depth"]/gz_frame_id:<data-string>:L246]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="oak_depth"]/depth_camera:<data-string>:L247]: XML Element[depth_camera], child of element[sensor], not defined in SDF. Copying[depth_camera] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="lidar"]/gz_frame_id:<data-string>:L285]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Warning [Utils.cc:132] [/sdf/model[@name="rosbot"]/link[@name="base_link"]/sensor[@name="imu"]/gz_frame_id:<data-string>:L354]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+Model: [10]
+  - Name: rosbot
+  - Pose [ XYZ (m) ] [ RPY (rad) ]:
+    [-0.000000 -0.000000 -14890800.000000]
+    [-0.000000 0.000000 -0.000000]
+mohamed_admin@rat-ws202:~/ros2_ws$ 
+

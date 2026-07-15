@@ -1,0 +1,21 @@
+to do list :
+
+-- gazebo worlds : installed but need to integrate them within the ros2 workspace
+		   also tuto to learn how to make worlds.
+
+--RL: -start to implement and train the rl agent to have an optimal structure for better navigation and implement it through reward functions and etc..
+      -check the einführung in plannungs- und entscheidungsalgorithment
+   
+--Dissecting the workspace : so that I could understand the whole global picture
+
+-ROS2 lernen
+
+--Making a map (maybe in the exploration phase , prioritize the making of the map) : mdp=true in case full map , pomdp=true in case too many errors .
+
+learn ros2 in parallel to rl agent task
+
+1- rl developping // ros2 -> 2-llm implementation : through reward functions r(x) : archetypes grasping the whole to rearrange as what we need like a puzzle. (darum muss man tuto von math formeln bilden können ) 
+
+about rl : read about how to use it in practise - check research and uni material for ppo and rl and shiiiiii
+
+bielefeld -tango - country bars 

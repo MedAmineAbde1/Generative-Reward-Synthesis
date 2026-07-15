@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sdf version="1.11">
+  <world name="bare_test">
+  <!-- Auto-injected by gz_migrator: required Gazebo Harmonic world plugins --><plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/><plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/><plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/><plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin><plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/><plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/><plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat"/><physics type="dart">
+    <max_step_size>0.001</max_step_size>
+    <real_time_factor>1</real_time_factor>
+    <dart/></physics>
+
+  <include>
+    <uri>model://sun</uri>
+  </include>
+  <include>
+    <uri>model://ground_plane</uri>
+  </include>
+
+  <model name="box">
+    <static>true</static>
+    <pose>0 0 0.5 0 0 0</pose>
+    <link name="link">
+      <collision name="col"><geometry><box><size>1 1 1</size></box></geometry></collision>
+      <visual name="vis">
+        <geometry><box><size>1 1 1</size></box></geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1.0</ambient><diffuse>0.5 0.5 0.5 1.0</diffuse><specular>0.1 0.1 0.1 1</specular></material>
+      </visual>
+    </link>
+    <!-- Buoyancy plugin -->
+    <plugin filename="gz-sim-buoyancy-system" name="gz::sim::systems::Buoyancy">
+      <fluid_density>1000</fluid_density>
+    </plugin>
+  </model>
+
+  <!-- GPS model -->
+  <model name="gps_robot">
+    <pose>1 0 0 0 0 0</pose>
+    <link name="base">
+      <sensor name="gps" type="gps">
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <topic>gps</topic></sensor>
+    </link>
+    <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+      <body_name>base</body_name>
+      <topic_name>pose</topic_name>
+    </plugin>
+  </model>
+
+<magnetic_field>5.5645e-6 22.8758e-6 -42.3884e-6</magnetic_field><atmosphere type="adiabatic"/></world>
+</sdf>

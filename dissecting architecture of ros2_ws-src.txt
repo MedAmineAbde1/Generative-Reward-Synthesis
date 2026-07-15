@@ -1,0 +1,163 @@
+husarion_gz_worlds/
+├── CMakeLists.txt   ← tells colcon "build me"
+├── package.xml      ← declares: my name, my dependencies
+├── config/          ← parameter or world config files
+├── env-hooks/       ← shell scripts that extend the environment on source
+├── launch/          ← launch files to start Gazebo with specific worlds
+├── maps/            ← 2D maps for navigation
+├── models/          ← 3D models (furniture, walls, objects)
+├── worlds/          ← Gazebo world definition files (.sdf or .world)
+└── images/          ← probably screenshots for the README
+
+rosbot_ros/
+├── rosbot/                      ← meta-package (just a pointer/grouping)
+├── rosbot_bringup/              ← launch files to start the real robot
+├── rosbot_description/          ← URDF: the robot's physical shape
+├── rosbot_controller/           ← how the wheels/joints are controlled
+├── rosbot_hardware_interfaces/  ← talks directly to real hardware
+├── rosbot_gazebo/               ← simulation-specific config/launch
+├── rosbot_localization/         ← where is the robot in the world?
+├── rosbot_joy/                  ← joystick/gamepad teleoperation
+├── rosbot_moveit/               ← motion planning (arm/manipulator)
+└── rosbot_utils/                ← shared helpers, small utilities
+
+------
+
+in summary :
+
+# Dissecting Your `src/` Directory
+
+---
+
+## What You're Looking At
+
+You have **two packages** (or more precisely, two repositories) inside `src/`:
+
+```
+ros2_ws/
+└── src/
+    ├── husarion_gz_worlds/     ← one repository, one package
+    └── rosbot_ros/             ← one repository, many packages inside
+```
+
+This is the standard pattern: `src/` is just a flat container. You clone repositories into it, and colcon doesn't care about the folder structure — it **crawls recursively** looking for `package.xml` files. Every folder containing a `package.xml` is a package.
+
+---
+
+## Package 1 — `husarion_gz_worlds`
+
+```
+husarion_gz_worlds/
+├── CMakeLists.txt   ← tells colcon "build me"
+├── package.xml      ← declares: my name, my dependencies
+├── config/          ← parameter or world config files
+├── env-hooks/       ← shell scripts that extend the environment on source
+├── launch/          ← launch files to start Gazebo with specific worlds
+├── maps/            ← 2D maps for navigation
+├── models/          ← 3D models (furniture, walls, objects)
+├── worlds/          ← Gazebo world definition files (.sdf or .world)
+└── images/          ← probably screenshots for the README
+```
+
+**What this package is:** A **pure environment/asset package.** It contains no robot logic. No nodes. No controllers. It exists purely to describe the *world* the robot lives in — the rooms, objects, and spaces that Gazebo simulates.
+
+**Analogy:** It's the **stage set**. It has nothing to do with the actors (the robot). It just defines where the action takes place.
+
+---
+
+## Package 2 — `rosbot_ros` (a metarepository)
+
+This is not one package — it's a **repository that contains many packages** inside it. Each subfolder with a `package.xml` is its own independent package. Let's read them by what they do:
+
+```
+rosbot_ros/
+├── rosbot/                      ← meta-package (just a pointer/grouping)
+├── rosbot_bringup/              ← launch files to start the real robot
+├── rosbot_description/          ← URDF: the robot's physical shape
+├── rosbot_controller/           ← how the wheels/joints are controlled
+├── rosbot_hardware_interfaces/  ← talks directly to real hardware
+├── rosbot_gazebo/               ← simulation-specific config/launch
+├── rosbot_localization/         ← where is the robot in the world?
+├── rosbot_joy/                  ← joystick/gamepad teleoperation
+├── rosbot_moveit/               ← motion planning (arm/manipulator)
+└── rosbot_utils/                ← shared helpers, small utilities
+```
+
+Now let's read each one with meaning:
+
+---
+
+### `rosbot_description`
+Contains the **URDF** — a mathematical and geometric description of the robot. Link lengths, joint types, sensor positions, mass, inertia. This is the robot's **identity on paper**. Nothing runs from here. It just answers: *"what shape is this robot?"*
+
+---
+
+### `rosbot_controller`
+Implements **ros2_control** controllers — how velocity commands get translated into wheel commands. It sits between "I want to move at 0.5 m/s" and "send this PWM signal to the motor." The **translator between intent and motion**.
+
+---
+
+### `rosbot_hardware_interfaces`
+The **lowest layer** — talks directly to real physical hardware over serial, CAN, or similar. This is what changes when you swap hardware. Everything above this layer doesn't need to know you changed the motor board.
+
+---
+
+### `rosbot_bringup`
+The **entry point for the real robot**. Contains launch files that wire everything together — starts the hardware interface, the controllers, the localization, the description. You don't run packages individually; you run bringup and it orchestrates the rest.
+
+---
+
+### `rosbot_gazebo`
+The simulation equivalent of bringup — but for Gazebo. Starts the robot *inside* the simulated world instead of on real hardware. Swaps `rosbot_hardware_interfaces` for Gazebo physics. Everything else stays the same.
+
+---
+
+### `rosbot_localization`
+Answers: *"where is the robot right now?"* Typically runs an EKF (Extended Kalman Filter) fusing odometry and IMU data. Produces a `/odom` or `/map` → `/base_link` transform.
+
+---
+
+### `rosbot_joy`
+Lets a human drive the robot manually with a gamepad. Converts joystick axes into `geometry_msgs/Twist` velocity commands. Useful for testing and teleoperation.
+
+---
+
+### `rosbot_moveit`
+Motion planning for a **manipulator arm** (hence the `MANIPULATOR.md` in the root). MoveIt handles path planning, collision avoidance, and joint trajectory execution. Only relevant if the rosbot has an arm attached.
+
+---
+
+### `rosbot_utils`
+Shared utilities that don't belong to any specific layer — small helpers, common scripts, things multiple packages depend on.
+
+---
+
+### `rosbot` (the meta-package)
+Contains almost no code. Its `package.xml` simply **depends on all the other rosbot packages**. Installing or building `rosbot` pulls everything in. It's a convenience handle — *"give me all of rosbot in one command."*
+
+---
+
+## The Architecture in One Picture
+
+```
+         [ husarion_gz_worlds ]
+                  ↓ provides the world
+         ┌────────────────────────┐
+         │     rosbot_gazebo      │  ← simulation entry point
+         │     rosbot_bringup     │  ← real robot entry point
+         └────────┬───────────────┘
+                  │ orchestrates
+       ┌──────────┼──────────────┐
+       ↓          ↓              ↓
+rosbot_       rosbot_       rosbot_
+description  controller  localization
+  (shape)    (motion)     (position)
+                  ↓
+       rosbot_hardware_interfaces
+            (real hardware)
+       OR
+            Gazebo physics
+          (simulation hardware)
+```
+
+The workspace holds all of this. Colcon builds it all together. You source once. Then your launch file decides which path through this graph actually runs.

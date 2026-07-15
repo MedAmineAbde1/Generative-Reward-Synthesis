@@ -44,7 +44,7 @@ Reward synthesis experiments in progress
 
 📍 Roadmap / TODO
 
- Finalize simulation environment
- Implement baseline reward synthesis methods
- Run experiments and collect results
- Write thesis documentation
+ -Finalize simulation environment
+ -Implement baseline reward synthesis methods
+ -Run experiments and collect results
+ -Write thesis documentation
